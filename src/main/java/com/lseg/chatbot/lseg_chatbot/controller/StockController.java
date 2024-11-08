@@ -1,4 +1,7 @@
 package com.lseg.chatbot.lseg_chatbot.controller;
+import com.lseg.chatbot.lseg_chatbot.dto.PriceDto;
+import com.lseg.chatbot.lseg_chatbot.dto.StockExchangeDto;
+import com.lseg.chatbot.lseg_chatbot.dto.TopStocksDto;
 import com.lseg.chatbot.lseg_chatbot.model.Stock;
 import com.lseg.chatbot.lseg_chatbot.model.StockExchange;
 import com.lseg.chatbot.lseg_chatbot.repository.StockExchangeRepository;
@@ -19,42 +22,44 @@ public class StockController {
 
     private final StockExchangeService stockExchangeService;
 
-    private final StockExchangeRepository stockExchangeRepository;
 
 
-    public StockController(StockExchangeService stockExchangeService, StockExchangeRepository stockExchangeRepository) {
+    public StockController(StockExchangeService stockExchangeService) {
         this.stockExchangeService = stockExchangeService;
-        this.stockExchangeRepository = stockExchangeRepository;
     }
 
     @GetMapping("/get-all-stocks")
-    public ResponseEntity <List<String>> getAllStockExchangeNames() {
-        return ResponseEntity.ok().body(stockExchangeService.findAll().stream()
-                .map(StockExchange::getStockExchange)
-                .collect(Collectors.toList()));
+    public ResponseEntity <List<StockExchangeDto>> getAllStockExchangeNames() {
+        List<StockExchangeDto> stockExchangeNames = stockExchangeService.findAll().stream()
+                .map(stockExchange -> new StockExchangeDto(stockExchange.getStockExchange()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(stockExchangeNames);
     }
 
-    @GetMapping("/{name}/stocks")
-    public ResponseEntity<List<String>> getStocksByExchangeName(@PathVariable String name) {
-        Optional<StockExchange> stockExchange = stockExchangeService.findByStockExchangeName(name);
+    @GetMapping("/{id}/stocks")
+    public ResponseEntity<List<TopStocksDto>> getStocksByExchangeName(@PathVariable int id) {
 
-        if (stockExchange.isPresent()) {
-            List<String> stockNames = stockExchange.get().getTopStocks().stream()
-                    .map(Stock::getStockName)
+        List <Stock> stock = stockExchangeService.findByStockExchangeId(id);
+
+        if (!stock.isEmpty()) {
+            List<TopStocksDto> topStockExchanges = stockExchangeService.findByStockExchangeId(id).stream()
+                    .map(topStocks -> new TopStocksDto(topStocks.getStockName()))
                     .collect(Collectors.toList());
-            return ResponseEntity.ok(stockNames);
+            return ResponseEntity.ok(topStockExchanges);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/stocks/{name}/price")
-    public ResponseEntity<String> getStockPriceByName(@PathVariable String name) {
+    public ResponseEntity <PriceDto> getStockPriceByName(@PathVariable String name) {
         Optional<Double> stockPrice = stockExchangeService.findStockPriceByName(name);
 
         if (stockPrice.isPresent()) {
             String responseMessage = String.format("Stock price of %s is %.2f. Please select an option.", name, stockPrice.get());
-            return ResponseEntity.ok(responseMessage);
+            PriceDto price = new PriceDto();
+            price.setPrice(responseMessage);
+            return ResponseEntity.ok(price);
         } else {
             return ResponseEntity.notFound().build();
         }

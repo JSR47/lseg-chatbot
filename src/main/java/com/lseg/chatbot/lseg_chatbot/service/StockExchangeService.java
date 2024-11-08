@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lseg.chatbot.lseg_chatbot.model.Stock;
 import com.lseg.chatbot.lseg_chatbot.model.StockExchange;
 import com.lseg.chatbot.lseg_chatbot.repository.StockExchangeRepository;
+import com.lseg.chatbot.lseg_chatbot.repository.StockRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class StockExchangeService {
 
     @Autowired
     private StockExchangeRepository stockExchangeRepository;
+
+    @Autowired
+    private StockRepository stockRepository;
 
     public void saveStockDataFromFile() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -49,6 +53,10 @@ public class StockExchangeService {
 
     public Optional<StockExchange> findByStockExchangeName(String stockExchangeName) {
         return stockExchangeRepository.findByStockExchange(stockExchangeName);
+    }
+
+    public List <Stock> findByStockExchangeId(int id) {
+        return stockRepository.findByStockExchangeId(id);
     }
 
     public Optional<Double> findStockPriceByName(String stockName) {
