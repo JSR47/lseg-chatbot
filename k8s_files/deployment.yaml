@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: spoonythings-container
-        image: 309395755719.dkr.ecr.us-east-1.amazonaws.com/amazon-prime:latest
+        image: 913524947374.dkr.ecr.us-east-1.amazonaws.com/springboot-app:latest
         ports:
         - containerPort: 3000
 ...
