@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spoonythings-app
+  labels:
+    app: spoonythings-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spoonythings-app
+  template:
+    metadata:
+      labels:
+        app: spoonythings-app
+    spec:
+      containers:
+      - name: spoonythings-container
+        image: 309395755719.dkr.ecr.us-east-1.amazonaws.com/amazon-prime:latest
+        ports:
+        - containerPort: 3000
+...
